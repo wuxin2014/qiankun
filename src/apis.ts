@@ -207,6 +207,11 @@ export function loadMicroApp<T extends ObjectType>(
   return microApp;
 }
 
+// 开始启动
+/**
+ * FrameworkConfiguration
+ * @param opts
+ */
 export function start(opts: FrameworkConfiguration = {}) {
   frameworkConfiguration = { prefetch: true, singular: true, sandbox: true, ...opts };
   const { prefetch, urlRerouteOnly = defaultUrlRerouteOnly, ...importEntryOpts } = frameworkConfiguration;

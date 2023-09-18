@@ -72,8 +72,9 @@ function createElement(
 ): HTMLElement {
   const containerElement = document.createElement('div');
   containerElement.innerHTML = appContent;
-  // appContent always wrapped with a singular div
+  // appContent always wrapped with a singular div, appContent 由模版字符串变成了 DOM 元素
   const appElement = containerElement.firstChild as HTMLElement;
+  // 如果开启了严格的样式隔离，则将 appContent 的子元素（微应用的入口模版）用 shadow dom 包裹，以达到微应用之间样式严格隔离的目的
   if (strictStyleIsolation) {
     if (!supportShadowDOM) {
       console.warn(
@@ -187,6 +188,7 @@ function getRender(appInstanceId: string, appContent: string, legacyRender?: HTM
 
     if (containerElement && !containerElement.contains(element)) {
       // clear the container
+      // containerElement!.firstChild !.这是TypeScript的语法，叫非空断言操作符（non-null assertion operator），和?.相反，这个符号表示对象后面的属性一定不是null或undefined。
       while (containerElement!.firstChild) {
         rawRemoveChild.call(containerElement, containerElement!.firstChild);
       }
@@ -246,6 +248,7 @@ export async function loadApp<T extends ObjectType>(
   configuration: FrameworkConfiguration = {},
   lifeCycles?: FrameworkLifeCycles<T>,
 ): Promise<ParcelConfigObjectGetter> {
+  debugger;
   const { entry, name: appName } = app;
   const appInstanceId = genAppInstanceIdByName(appName);
 
@@ -275,7 +278,7 @@ export async function loadApp<T extends ObjectType>(
   }
 
   const appContent = getDefaultTplWrapper(appInstanceId, sandbox)(template);
-
+  // 是否严格样式隔离
   const strictStyleIsolation = typeof sandbox === 'object' && !!sandbox.strictStyleIsolation;
 
   if (process.env.NODE_ENV === 'development' && strictStyleIsolation) {
@@ -283,22 +286,23 @@ export async function loadApp<T extends ObjectType>(
       "[qiankun] strictStyleIsolation configuration will be removed in 3.0, pls don't depend on it or use experimentalStyleIsolation instead!",
     );
   }
-
+  // 实验性的样式隔离，后面就叫 scoped css，和严格样式隔离不能同时开启，如果开启了严格样式隔离，则 scoped css 就为 false，强制关闭
   const scopedCSS = isEnableScopedCSS(sandbox);
+  // 初始子应用包裹元素
   let initialAppWrapperElement: HTMLElement | null = createElement(
     appContent,
     strictStyleIsolation,
     scopedCSS,
     appInstanceId,
   );
-
+  // 子应用所属容器元素
   const initialContainer = 'container' in app ? app.container : undefined;
   const legacyRender = 'render' in app ? app.render : undefined;
 
   const render = getRender(appInstanceId, appContent, legacyRender);
 
   // 第一次加载设置应用可见区域 dom 结构
-  // 确保每次应用加载前容器 dom 结构已经设置完毕
+  // 确保每次应用加载前容器dom结构已经设置完毕
   render({ element: initialAppWrapperElement, loading: true, container: initialContainer }, 'loading');
 
   const initialAppWrapperGetter = getAppWrapperGetter(
