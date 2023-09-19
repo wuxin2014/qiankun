@@ -84,8 +84,8 @@ const useNativeWindowForBindingsProps = new Map<PropertyKey, boolean>([
 function createFakeWindow(globalContext: Window, speedy: boolean) {
   // map always has the fastest performance in has check scenario
   // see https://jsperf.com/array-indexof-vs-set-has/23
-  const propertiesWithGetter = new Map<PropertyKey, boolean>();
-  const fakeWindow = {} as FakeWindow;
+  const propertiesWithGetter = new Map<PropertyKey, boolean>(); // 对象描述器中带有getter函数的属性
+  const fakeWindow = {} as FakeWindow; // 初始化空对象
 
   /*
    copy the non-configurable property of global to fakeWindow
@@ -145,6 +145,7 @@ function createFakeWindow(globalContext: Window, speedy: boolean) {
 let activeSandboxCount = 0;
 
 /**
+ * ProxySandbox多例沙箱
  * 基于 Proxy 实现的沙箱
  */
 export default class ProxySandbox implements SandBox {
@@ -217,10 +218,10 @@ export default class ProxySandbox implements SandBox {
             // here we ignored accessor descriptor of globalContext as it makes no sense to trigger its logic(which might make sandbox escaping instead)
             // we force to set value by data descriptor
             if (writable || set) {
-              Object.defineProperty(target, p, { configurable, enumerable, writable: true, value });
+              Object.defineProperty(target, p, { configurable, enumerable, writable: true, value }); // 符合条件的，本身没有的属性，从新定义下
             }
           } else {
-            target[p] = value;
+            target[p] = value; // 直接修改值
           }
 
           // sync the property to globalContext

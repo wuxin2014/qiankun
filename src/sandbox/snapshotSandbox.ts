@@ -27,9 +27,9 @@ export default class SnapshotSandbox implements SandBox {
 
   sandboxRunning = true;
 
-  private windowSnapshot!: Window;
+  private windowSnapshot!: Window; // window
 
-  private modifyPropsMap: Record<any, any> = {};
+  private modifyPropsMap: Record<any, any> = {}; // 修改属性对象
 
   constructor(name: string) {
     this.name = name;
@@ -40,6 +40,7 @@ export default class SnapshotSandbox implements SandBox {
   active() {
     // 记录当前快照
     this.windowSnapshot = {} as Window;
+    // 拷贝window对象属性到windowSnapshot对象上
     iter(window, (prop) => {
       this.windowSnapshot[prop] = window[prop];
     });
@@ -56,6 +57,7 @@ export default class SnapshotSandbox implements SandBox {
     this.modifyPropsMap = {};
 
     iter(window, (prop) => {
+      // 比较同一属性值是否一样
       if (window[prop] !== this.windowSnapshot[prop]) {
         // 记录变更，恢复环境
         this.modifyPropsMap[prop] = window[prop];

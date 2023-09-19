@@ -64,3 +64,6 @@ export async function unmount() {
   instance = null;
   router = null;
 }
+
+// qiankun 不会将 script 标签加载到dom上，如果这样做，那么就失去了隔离的意义
+// 获取到 script 标签上的 src ，通过 fetch 发情请求加载js文件，之后会在沙箱内执行这个文件内的js代码，再之后触发自定义的 load 事件，进而触发 webpack 内的 script.onload 方法，完成代码分割的后续流程

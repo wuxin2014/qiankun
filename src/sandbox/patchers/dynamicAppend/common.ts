@@ -266,7 +266,7 @@ function getOverwrittenAppendChildOrInsertBefore(opts: {
           const referenceNode = mountDOM.contains(refChild) ? refChild : null;
           return rawDOMAppendOrInsertBefore.call(mountDOM, stylesheetElement, referenceNode);
         }
-
+        // 在沙箱内执行js代码
         case SCRIPT_TAG_NAME: {
           const { src, text } = element as HTMLScriptElement;
           // some script like jsonp maybe not support cors which shouldn't use execScripts
